@@ -5,6 +5,10 @@
 
 #include "base64.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static void
 test(unsigned char *encode, unsigned int encodelen,
      char *decode, unsigned int decodelen)
@@ -12,13 +16,15 @@ test(unsigned char *encode, unsigned int encodelen,
 	char *encode_out;;
 	unsigned char *decode_out;
 
-	encode_out = malloc(BASE64_ENCODE_OUT_SIZE(encodelen));
-	decode_out = malloc(BASE64_DECODE_OUT_SIZE(decodelen));
+	encode_out = (char *)malloc(BASE64_ENCODE_OUT_SIZE(encodelen));
+	decode_out = (unsigned char *)malloc(BASE64_DECODE_OUT_SIZE(decodelen));
+
 	assert(encode_out);
 	assert(decode_out);
 
 	assert(base64_encode(encode, encodelen, encode_out) == decodelen);
 	assert(memcmp(encode_out, decode, decodelen) == 0);
+
 	assert(base64_decode(decode, decodelen, decode_out) == encodelen);
 	assert(memcmp(decode_out, encode, encodelen) == 0);
 
@@ -29,13 +35,14 @@ test(unsigned char *encode, unsigned int encodelen,
 int
 main(void)
 {
-	test((void *)"", 0, "", 0);
-	test((void *)"f", 1, "Zg==", 4);
-	test((void *)"fo", 2, "Zm8=", 4);
-	test((void *)"foo", 3, "Zm9v", 4);
-	test((void *)"foob", 4, "Zm9vYg==", 8);
-	test((void *)"fooba", 5, "Zm9vYmE=", 8);
-	test((void *)"foobar", 6, "Zm9vYmFy", 8);
+	test((unsigned char *)"foobar", 6, (char *)"Zm9vYmFy", 8);
+
+	printf("all check pass!\n");
 
 	return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif
+
